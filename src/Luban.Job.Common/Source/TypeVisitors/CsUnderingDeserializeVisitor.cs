@@ -65,7 +65,7 @@ namespace Luban.Job.Common.TypeVisitors
 
         public string Accept(TString type, string bufName, string fieldName, int depth)
         {
-            return $"{fieldName} = {bufName}.ReadString();";
+            return $"{fieldName} = string.Intern({bufName}.ReadString());";
         }
 
         public string Accept(TBytes type, string bufName, string fieldName, int depth)

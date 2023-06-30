@@ -64,7 +64,7 @@ namespace Luban.Job.Db.TypeVisitors
 
         public string Accept(TString type, string bufName, string fieldName)
         {
-            return $"{fieldName} = {bufName}.ReadString();";
+            return $"{fieldName} = string.Intern({bufName}.ReadString());";
         }
 
         public string Accept(TBytes type, string bufName, string fieldName)
@@ -74,7 +74,7 @@ namespace Luban.Job.Db.TypeVisitors
 
         public string Accept(TText type, string bufName, string fieldName)
         {
-            return $"{fieldName} = {bufName}.ReadString();";
+            return $"{fieldName} = string.Intern({bufName}.ReadString());";
         }
 
         public string Accept(TBean type, string bufName, string fieldName)
