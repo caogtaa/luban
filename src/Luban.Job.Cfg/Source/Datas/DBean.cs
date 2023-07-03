@@ -32,7 +32,14 @@ namespace Luban.Job.Cfg.Datas
 
         public override int GetHashCode()
         {
-            throw new System.NotSupportedException();
+            // throw new System.NotSupportedException();
+            int ret = this.Fields.Count;
+            foreach (var d in Fields)
+            {
+                ret = (int)(ret * 157 + d.GetHashCode());
+            }
+
+            return ret;
         }
 
         public override int CompareTo(DType other)

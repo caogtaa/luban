@@ -2,6 +2,7 @@ using Luban.Job.Cfg.DataVisitors;
 using Luban.Job.Cfg.Utils;
 using Luban.Job.Common.Types;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Luban.Job.Cfg.Datas
 {
@@ -26,7 +27,24 @@ namespace Luban.Job.Cfg.Datas
 
         public override int GetHashCode()
         {
-            throw new System.NotSupportedException();
+            int ret = this.Datas.Count;
+            foreach (var d in Datas)
+            {
+                ret = (int)(ret * 179 + d.GetHashCode());
+            }
+
+            return ret;
+
+            //StringBuilder sb = new();
+            //sb.Append(this.Datas.Count);
+            //foreach (var d in Datas)
+            //{
+            //    d.GetHashCode();
+            //    sb.Append(d.ToString());
+            //}
+            //return sb.ToString().GetHashCode();
+
+            // throw new System.NotSupportedException();
         }
 
         public override void Apply<T>(IDataActionVisitor<T> visitor, T x)

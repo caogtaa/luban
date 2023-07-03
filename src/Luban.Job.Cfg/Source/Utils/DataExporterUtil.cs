@@ -39,7 +39,7 @@ namespace Luban.Job.Cfg.Utils
                 case "data_bin":
                 {
                     var buf = ThreadLocalTemporalByteBufPool.Alloc(1024 * 1024);
-                    BinaryExportor.Ins.WriteList(table, records, buf);
+                    new BinaryExportor().WriteList(table, records, buf);
                     var bytes = buf.CopyData();
                     ThreadLocalTemporalByteBufPool.Free(buf);
                     return bytes;

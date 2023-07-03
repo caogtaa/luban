@@ -18,17 +18,18 @@ namespace Luban.Job.Cfg.DataExporters
             x.WriteSize(datas.Count);
             var tableDataBuf = new ByteBuf(10 * 1024);
             tableDataBuf.WriteSize(datas.Count);
+            var binExportor = new BinaryExportor();
 
             foreach (var d in datas)
             {
                 int offset = tableDataBuf.Size;
-                d.Data.Apply(BinaryExportor.Ins, tableDataBuf);
+                d.Data.Apply(binExportor, tableDataBuf);
 
                 string keyStr = "";
                 foreach (IndexInfo index in table.IndexList)
                 {
                     DType key = d.Data.Fields[index.IndexFieldIdIndex];
-                    key.Apply(BinaryExportor.Ins, x);
+                    key.Apply(binExportor, x);
                     keyStr += key.ToString() + ",";
                 }
                 x.WriteSize(offset);

@@ -80,7 +80,12 @@ namespace Luban.Job.Common.TypeVisitors
 
         public string Accept(TBean type, string bufName, string fieldName, int depth)
         {
-            string src = $"{type.Bean.FullName}.Deserialize{type.Bean.Name}({bufName})";
+            string src;
+            if (depth == 0 && type.Bean.Parent == null)
+                src = $"{type.Bean.FullName}.Deserialize{type.Bean.Name}({bufName}, _dataList)";
+            else
+                src = $"{type.Bean.FullName}.Deserialize{type.Bean.Name}({bufName}, null)";
+
             return $"{fieldName} = {ExternalTypeUtil.CsCloneToExternal(type.Bean.FullName, src)};";
         }
 
@@ -107,10 +112,19 @@ namespace Luban.Job.Common.TypeVisitors
 
         public string Accept(TList type, string bufName, string fieldName, int depth)
         {
+            // TODO: 应该是改的这里
             string n = $"n{depth}";
             string _e = $"_e{depth}";
             string i = $"i{depth}";
-            return $"{{int {n} = System.Math.Min({bufName}.ReadSize(), {bufName}.Size);{fieldName} = new {type.Apply(CsDefineTypeName.Ins)}({n});for(var {i} = 0 ; {i} < {n} ; {i}++) {{ {type.ElementType.Apply(CsDefineTypeName.Ins)} {_e};  {type.ElementType.Apply(this, bufName, $"{_e}", depth + 1)} {fieldName}.Add({_e});}}}}";
+            return $"{{int {n} = {bufName}.ReadSize();\n" +
+                $"        if ({n} >= 0) {{\n" +
+                $"            {n} = System.Math.Min({n}, _buf.Size);\n" +
+                $"            {fieldName} = new {type.Apply(CsDefineTypeName.Ins)}({n});for(var {i} = 0 ; {i} < {n} ; {i}++) {{ {type.ElementType.Apply(CsDefineTypeName.Ins)} {_e};  {type.ElementType.Apply(this, bufName, $"{_e}", depth + 1)} {fieldName}.Add({_e});}}\n" +
+                $"        }} else {{\n" +
+                $"            {n} = -{n}-1;\n" +
+                $"            {fieldName} = dataList[{n}].{fieldName};\n" +
+                $"        }}}}";
+            // return $"{{int {n} = System.Math.Min({bufName}.ReadSize(), {bufName}.Size);{fieldName} = new {type.Apply(CsDefineTypeName.Ins)}({n});for(var {i} = 0 ; {i} < {n} ; {i}++) {{ {type.ElementType.Apply(CsDefineTypeName.Ins)} {_e};  {type.ElementType.Apply(this, bufName, $"{_e}", depth + 1)} {fieldName}.Add({_e});}}}}";
         }
 
         public string Accept(TSet type, string bufName, string fieldName, int depth)
